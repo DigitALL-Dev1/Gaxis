@@ -1,0 +1,253 @@
+.page {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #fafcfb;
+}
+.story {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px 10%;
+  background: #073e2b;
+  color: white;
+}
+.story::before {
+  content: "";
+  position: absolute;
+  width: 620px;
+  height: 620px;
+  right: -360px;
+  bottom: -250px;
+  border: 1px solid #ffffff20;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 65px #ffffff04,
+    0 0 0 66px #ffffff12,
+    0 0 0 130px #ffffff03,
+    0 0 0 131px #ffffff10;
+  pointer-events: none;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+.brandMark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  background: #ffffff16;
+  border: 1px solid #ffffff35;
+  border-radius: 12px;
+}
+.brandName {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.1;
+}
+.brandSub {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  opacity: 0.65;
+  margin-top: 5px;
+}
+.pitch {
+  position: relative;
+  max-width: 440px;
+  padding: 64px 0 52px;
+}
+.eyebrow {
+  color: #96d8af;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.pitch h1 {
+  font-size: clamp(36px, 4vw, 56px);
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  margin: 20px 0;
+}
+.pitch h1 span {
+  color: #a2e5bd;
+}
+.pitch p {
+  max-width: 350px;
+  color: #c1d6cc;
+  line-height: 1.8;
+  font-size: 15px;
+}
+.document {
+  margin-top: 34px;
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid #ffffff26;
+  background: #ffffff08;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.documentIcon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 52px;
+  background: #ffffff12;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+}
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  font-size: 11px;
+  color: #a9c6b7;
+}
+.main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 35px 8% 24px;
+}
+.topline {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  color: #6d7d73;
+  font-size: 11px;
+}
+.form {
+  width: 100%;
+  max-width: 410px;
+  margin: 46px auto;
+}
+.module {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border: 1px solid #d6e9de;
+  border-radius: 7px;
+  color: #168447;
+  background: #edf7f1;
+  font-size: 12px;
+  font-weight: 600;
+}
+.form h2 {
+  font-size: 32px;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+  margin: 19px 0 6px;
+  color: #173829;
+}
+.subtitle {
+  color: #728077;
+  font-size: 14px;
+  line-height: 1.65;
+  margin: 0 0 28px;
+}
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 11px;
+  color: #8a958e;
+  margin: 23px 0;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: #e0e7e2;
+}
+.notice {
+  border-top: 1px solid #e0e7e2;
+  margin-top: 26px;
+  padding-top: 18px;
+  font-size: 11px;
+  color: #78877e;
+  line-height: 1.7;
+  display: flex;
+  gap: 9px;
+}
+.steps {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+  color: #849087;
+}
+.steps b {
+  color: #168447;
+  font-weight: 500;
+}
+.mainFooter {
+  text-align: center;
+  color: #909a94;
+  font-size: 10px;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid #e4ebe6;
+}
+@media (min-width: 1500px) {
+  .story {
+    padding-left: 16%;
+  }
+}
+@media (max-width: 900px) {
+  .page {
+    grid-template-columns: 0.85fr 1fr;
+  }
+  .story {
+    padding: 36px 9%;
+  }
+  .pitch h1 {
+    font-size: 38px;
+  }
+  .main {
+    padding: 28px 8%;
+  }
+}
+@media (max-width: 650px) {
+  .page {
+    display: block;
+  }
+  .story {
+    padding: 22px 24px;
+  }
+  .pitch,
+  .footer {
+    display: none;
+  }
+  .brandName {
+    font-size: 17px;
+  }
+  .brandMark {
+    width: 36px;
+    height: 36px;
+  }
+  .main {
+    min-height: calc(100svh - 83px);
+    padding: 22px 24px;
+  }
+  .form {
+    margin: 32px auto;
+  }
+}

@@ -14,7 +14,7 @@ import mantineCss from "@mantine/core/styles.css?url";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { AppShell } from "@/components/lumen/AppShell";
+import { AuthBoundary } from "@/components/lumen/AuthBoundary";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -154,9 +154,9 @@ function RootComponent() {
     >
       <QueryClientProvider client={queryClient}>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <AppShell>
+        <AuthBoundary>
           <Outlet />
-        </AppShell>
+        </AuthBoundary>
         <Toaster richColors position="top-right" />
       </QueryClientProvider>
     </MantineProvider>

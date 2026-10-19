@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as LibraryRouteImport } from './routes/library'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as MediaRouteImport } from './routes/media'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
@@ -35,6 +36,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const LibraryRoute = LibraryRouteImport.update({
   id: '/library',
   path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MeRoute = MeRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
   '/me': typeof MeRoute
   '/media': typeof MediaRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
   '/me': typeof MeRoute
   '/media': typeof MediaRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
   '/me': typeof MeRoute
   '/media': typeof MediaRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/library'
+    | '/login'
     | '/me'
     | '/media'
     | '/admin/audit'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/library'
+    | '/login'
     | '/me'
     | '/media'
     | '/admin/audit'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/library'
+    | '/login'
     | '/me'
     | '/media'
     | '/admin/audit'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   LibraryRoute: typeof LibraryRoute
+  LoginRoute: typeof LoginRoute
   MeRoute: typeof MeRoute
   MediaRoute: typeof MediaRoute
   AdminAuditRoute: typeof AdminAuditRoute
@@ -207,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/library'
       fullPath: '/library'
       preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/me': {
@@ -279,6 +299,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   LibraryRoute: LibraryRoute,
+  LoginRoute: LoginRoute,
   MeRoute: MeRoute,
   MediaRoute: MediaRoute,
   AdminAuditRoute: AdminAuditRoute,

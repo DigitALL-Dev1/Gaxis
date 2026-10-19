@@ -2,6 +2,8 @@
 
 Frontend prototype for controlled document publication, access, reading and acknowledgement.
 
+Start at `/login`. Google Workspace offers a mock GREEN account chooser; email login links are simulated on screen without sending mail. Both paths show a GAXIS M1 identity, role and access validation step before opening the workspace. Use **Explore with a demo account** to select a known email. Unknown accounts and external reviewers without active grants are denied by the demonstration logic. Sessions use sessionStorage; sign out from the profile menu. Browser session gating is a UI simulation, not production authentication or access enforcement.
+
 Run `npm install` followed by `npm run dev`. Use `npm run build` for a production build and `npm test` for workflow tests.
 
 Includes all eleven screens from the brief, 18 sample document versions, six training materials, role switching, external grants and CSV audit export. Switch demo roles from the profile menu; use **Reset demo data** to restore sample records. Prepare as Document Owner, then switch to Releaser to approve. Approving a matching reference supersedes its previous current version.
