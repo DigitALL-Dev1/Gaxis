@@ -1,37 +1,46 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { useDemoAuth } from "@/lib/lumen/auth";
-import { useLumen } from "@/lib/lumen/store";
+import { useAdminAuth } from "@/lib/lumen/admin-auth";
+import { useUserAuth } from "@/lib/lumen/user-auth";
 import { AppShell } from "./AppShell";
 import { LoadingState } from "./common";
 
 export function AuthBoundary({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
-  const session = useDemoAuth((s) => s.session);
+  const admin = useAdminAuth((s) => s.admin);
+  const user = useUserAuth((s) => s.user);
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
-  const publicPage = path === "/login";
+  const loginPage = path === "/login";
+  const verificationPage = path === "/verify-login";
+  const publicPage = loginPage || verificationPage;
   useEffect(() => {
+    if (verificationPage) {
+      setReady(true);
+      return;
+    }
     let active = true;
-    void Promise.all([useLumen.persist.rehydrate(), useDemoAuth.persist.rehydrate()]).then(() => {
-      const saved = useDemoAuth.getState().session;
-      if (saved) useLumen.getState().setRole(saved.role);
-      if (active) setReady(true);
-    });
+    void useUserAuth
+      .getState()
+      .restore()
+      .catch(() => {})
+      .finally(() => {
+        if (active) setReady(true);
+      });
     return () => {
       active = false;
     };
-  }, []);
+  }, [verificationPage]);
   useEffect(() => {
     if (!ready) return;
-    if (!session && !publicPage) void navigate({ to: "/login", replace: true });
-    if (session && publicPage)
+    if (!admin && !user && !publicPage) void navigate({ to: "/login", replace: true });
+    if ((admin || user) && loginPage)
       void navigate({
-        to: session.role === "External Reviewer" ? "/library" : "/dashboard",
+        to: "/dashboard",
         replace: true,
       });
-  }, [ready, session, publicPage, navigate]);
-  if (!ready || (!session && !publicPage) || (session && publicPage))
+  }, [ready, admin, user, publicPage, loginPage, navigate]);
+  if (!ready || (!admin && !user && !publicPage) || ((admin || user) && loginPage))
     return (
       <div
         className="grid min-h-screen place-items-center bg-background"

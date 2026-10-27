@@ -1,16 +1,18 @@
 # GAXIS-Lumen — GREEN Limited
 
-Frontend prototype for controlled document publication, access, reading and acknowledgement.
+Frontend for controlled document preparation, publication and access management.
 
-Start at `/login`. Google Workspace offers a mock GREEN account chooser; email login links are simulated on screen without sending mail. Both paths show a GAXIS M1 identity, role and access validation step before opening the workspace. Use **Explore with a demo account** to select a known email. Unknown accounts and external reviewers without active grants are denied by the demonstration logic. Sessions use sessionStorage; sign out from the profile menu. Browser session gating is a UI simulation, not production authentication or access enforcement.
+Start at `/login` to request an email sign-in link for a registered user, or use the separate development administrator login. User verification creates a revocable HttpOnly cookie session; reload calls `/api/v1/auth/me` to refresh permissions from MongoDB. Menus, dashboard modules and route gates use permission codes. Backend API dependencies enforce those permissions independently. See [authentication setup](AUTH_INTEGRATION.md) for SMTP, frontend origins, cookies and validation. Copy `.env.example` to `.env` to configure `VITE_API_BASE_URL`.
 
 Run `npm install` followed by `npm run dev`. Use `npm run build` for a production build and `npm test` for workflow tests.
 
-Includes all eleven screens from the brief, 18 sample document versions, six training materials, role switching, external grants and CSV audit export. Switch demo roles from the profile menu; use **Reset demo data** to restore sample records. Prepare as Document Owner, then switch to Releaser to approve. Approving a matching reference supersedes its previous current version.
+User, role, reader class, family and document management use FastAPI and MongoDB. Prepare Document sends real multipart uploads (PDF, DOC or DOCX, up to 100 MB) for assigned families. My Prepared Documents shows version history and pending status separately from the approved version. The library shows only permitted approved documents. The release queue supports authenticated file review, independent approval and returns for correction. Released revisions supersede the previous approved version. See [document integration](DOCUMENT_MANAGEMENT_INTEGRATION.md).
 
-Uses React, TypeScript, Vite, Zustand, Mantine and Tabler Icons. The existing Lovable TanStack router and shared UI components are retained for project compatibility. No backend, real authentication, file processing or integrations are implemented. Files retain their name only; the reader and media player simulate content. Browser-local state persists in localStorage. Roles and grants demonstrate behavior and provide no production security.
+Access Grants Management uses database users, eligible approved documents and explicit CEO/divisional-manager disclosure approval. It supports pending requests, rejection, revocation, renewal and expiry monitoring. Configure ordinary family grant approvers in Document Families. See [access grants integration](ACCESS_GRANTS_INTEGRATION.md).
 
-Administration forms maintain demo reference data; they do not provision identities or alter hard-coded role permissions. Safety and induction playback requires 90% accumulated simulated playback before acknowledgement.
+Document details display actual metadata, review history and authenticated file previews (PDF inline, Word download). The dashboard uses API summaries and approved documents. Unintegrated My Reading, Media Library, Team Progress and Audit Logs screens, seeded data, sample notifications and demo reset controls have been removed. See [frontend module review](FRONTEND_MODULE_REVIEW.md).
+
+Uses React, TypeScript, Vite, Zustand, Mantine and the existing Lovable TanStack router. Production identity integration with GAXIS M1 remains separate. Restart the backend after Python changes to load the latest session, permission and upload routes.
 
 This project was built with [Lovable](https://lovable.dev).
 

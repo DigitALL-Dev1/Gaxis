@@ -13,15 +13,17 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as MeRouteImport } from './routes/me'
-import { Route as MediaRouteImport } from './routes/media'
-import { Route as AdminAuditRouteImport } from './routes/admin.audit'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as VerifyLoginRouteImport } from './routes/verify-login'
+import { Route as AdminFamiliesRouteImport } from './routes/admin.families'
 import { Route as AdminGrantsRouteImport } from './routes/admin.grants'
 import { Route as AdminPrepareRouteImport } from './routes/admin.prepare'
+import { Route as AdminPreparedRouteImport } from './routes/admin.prepared'
+import { Route as AdminReaderClassesRouteImport } from './routes/admin.reader-classes'
 import { Route as AdminReleaseRouteImport } from './routes/admin.release'
+import { Route as AdminRolesRouteImport } from './routes/admin.roles'
 import { Route as AdminSystemRouteImport } from './routes/admin.system'
 import { Route as DIdRouteImport } from './routes/d.$id'
-import { Route as ManageTeamRouteImport } from './routes/manage.team'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -43,19 +45,19 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MeRoute = MeRouteImport.update({
-  id: '/me',
-  path: '/me',
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MediaRoute = MediaRouteImport.update({
-  id: '/media',
-  path: '/media',
+const VerifyLoginRoute = VerifyLoginRouteImport.update({
+  id: '/verify-login',
+  path: '/verify-login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminAuditRoute = AdminAuditRouteImport.update({
-  id: '/admin/audit',
-  path: '/admin/audit',
+const AdminFamiliesRoute = AdminFamiliesRouteImport.update({
+  id: '/admin/families',
+  path: '/admin/families',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminGrantsRoute = AdminGrantsRouteImport.update({
@@ -68,9 +70,24 @@ const AdminPrepareRoute = AdminPrepareRouteImport.update({
   path: '/admin/prepare',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPreparedRoute = AdminPreparedRouteImport.update({
+  id: '/admin/prepared',
+  path: '/admin/prepared',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminReaderClassesRoute = AdminReaderClassesRouteImport.update({
+  id: '/admin/reader-classes',
+  path: '/admin/reader-classes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminReleaseRoute = AdminReleaseRouteImport.update({
   id: '/admin/release',
   path: '/admin/release',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRolesRoute = AdminRolesRouteImport.update({
+  id: '/admin/roles',
+  path: '/admin/roles',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminSystemRoute = AdminSystemRouteImport.update({
@@ -83,41 +100,40 @@ const DIdRoute = DIdRouteImport.update({
   path: '/d/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ManageTeamRoute = ManageTeamRouteImport.update({
-  id: '/manage/team',
-  path: '/manage/team',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
-  '/me': typeof MeRoute
-  '/media': typeof MediaRoute
-  '/admin/audit': typeof AdminAuditRoute
+  '/profile': typeof ProfileRoute
+  '/verify-login': typeof VerifyLoginRoute
+  '/admin/families': typeof AdminFamiliesRoute
   '/admin/grants': typeof AdminGrantsRoute
   '/admin/prepare': typeof AdminPrepareRoute
+  '/admin/prepared': typeof AdminPreparedRoute
+  '/admin/reader-classes': typeof AdminReaderClassesRoute
   '/admin/release': typeof AdminReleaseRoute
+  '/admin/roles': typeof AdminRolesRoute
   '/admin/system': typeof AdminSystemRoute
   '/d/$id': typeof DIdRoute
-  '/manage/team': typeof ManageTeamRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
-  '/me': typeof MeRoute
-  '/media': typeof MediaRoute
-  '/admin/audit': typeof AdminAuditRoute
+  '/profile': typeof ProfileRoute
+  '/verify-login': typeof VerifyLoginRoute
+  '/admin/families': typeof AdminFamiliesRoute
   '/admin/grants': typeof AdminGrantsRoute
   '/admin/prepare': typeof AdminPrepareRoute
+  '/admin/prepared': typeof AdminPreparedRoute
+  '/admin/reader-classes': typeof AdminReaderClassesRoute
   '/admin/release': typeof AdminReleaseRoute
+  '/admin/roles': typeof AdminRolesRoute
   '/admin/system': typeof AdminSystemRoute
   '/d/$id': typeof DIdRoute
-  '/manage/team': typeof ManageTeamRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,15 +141,17 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
-  '/me': typeof MeRoute
-  '/media': typeof MediaRoute
-  '/admin/audit': typeof AdminAuditRoute
+  '/profile': typeof ProfileRoute
+  '/verify-login': typeof VerifyLoginRoute
+  '/admin/families': typeof AdminFamiliesRoute
   '/admin/grants': typeof AdminGrantsRoute
   '/admin/prepare': typeof AdminPrepareRoute
+  '/admin/prepared': typeof AdminPreparedRoute
+  '/admin/reader-classes': typeof AdminReaderClassesRoute
   '/admin/release': typeof AdminReleaseRoute
+  '/admin/roles': typeof AdminRolesRoute
   '/admin/system': typeof AdminSystemRoute
   '/d/$id': typeof DIdRoute
-  '/manage/team': typeof ManageTeamRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -142,45 +160,51 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/library'
     | '/login'
-    | '/me'
-    | '/media'
-    | '/admin/audit'
+    | '/profile'
+    | '/verify-login'
+    | '/admin/families'
     | '/admin/grants'
     | '/admin/prepare'
+    | '/admin/prepared'
+    | '/admin/reader-classes'
     | '/admin/release'
+    | '/admin/roles'
     | '/admin/system'
     | '/d/$id'
-    | '/manage/team'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
     | '/library'
     | '/login'
-    | '/me'
-    | '/media'
-    | '/admin/audit'
+    | '/profile'
+    | '/verify-login'
+    | '/admin/families'
     | '/admin/grants'
     | '/admin/prepare'
+    | '/admin/prepared'
+    | '/admin/reader-classes'
     | '/admin/release'
+    | '/admin/roles'
     | '/admin/system'
     | '/d/$id'
-    | '/manage/team'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
     | '/library'
     | '/login'
-    | '/me'
-    | '/media'
-    | '/admin/audit'
+    | '/profile'
+    | '/verify-login'
+    | '/admin/families'
     | '/admin/grants'
     | '/admin/prepare'
+    | '/admin/prepared'
+    | '/admin/reader-classes'
     | '/admin/release'
+    | '/admin/roles'
     | '/admin/system'
     | '/d/$id'
-    | '/manage/team'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -188,15 +212,17 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
-  MeRoute: typeof MeRoute
-  MediaRoute: typeof MediaRoute
-  AdminAuditRoute: typeof AdminAuditRoute
+  ProfileRoute: typeof ProfileRoute
+  VerifyLoginRoute: typeof VerifyLoginRoute
+  AdminFamiliesRoute: typeof AdminFamiliesRoute
   AdminGrantsRoute: typeof AdminGrantsRoute
   AdminPrepareRoute: typeof AdminPrepareRoute
+  AdminPreparedRoute: typeof AdminPreparedRoute
+  AdminReaderClassesRoute: typeof AdminReaderClassesRoute
   AdminReleaseRoute: typeof AdminReleaseRoute
+  AdminRolesRoute: typeof AdminRolesRoute
   AdminSystemRoute: typeof AdminSystemRoute
   DIdRoute: typeof DIdRoute
-  ManageTeamRoute: typeof ManageTeamRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -229,25 +255,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/me': {
-      id: '/me'
-      path: '/me'
-      fullPath: '/me'
-      preLoaderRoute: typeof MeRouteImport
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/media': {
-      id: '/media'
-      path: '/media'
-      fullPath: '/media'
-      preLoaderRoute: typeof MediaRouteImport
+    '/verify-login': {
+      id: '/verify-login'
+      path: '/verify-login'
+      fullPath: '/verify-login'
+      preLoaderRoute: typeof VerifyLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/audit': {
-      id: '/admin/audit'
-      path: '/admin/audit'
-      fullPath: '/admin/audit'
-      preLoaderRoute: typeof AdminAuditRouteImport
+    '/admin/families': {
+      id: '/admin/families'
+      path: '/admin/families'
+      fullPath: '/admin/families'
+      preLoaderRoute: typeof AdminFamiliesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/grants': {
@@ -264,11 +290,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPrepareRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/prepared': {
+      id: '/admin/prepared'
+      path: '/admin/prepared'
+      fullPath: '/admin/prepared'
+      preLoaderRoute: typeof AdminPreparedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/reader-classes': {
+      id: '/admin/reader-classes'
+      path: '/admin/reader-classes'
+      fullPath: '/admin/reader-classes'
+      preLoaderRoute: typeof AdminReaderClassesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/release': {
       id: '/admin/release'
       path: '/admin/release'
       fullPath: '/admin/release'
       preLoaderRoute: typeof AdminReleaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/roles': {
+      id: '/admin/roles'
+      path: '/admin/roles'
+      fullPath: '/admin/roles'
+      preLoaderRoute: typeof AdminRolesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/system': {
@@ -285,13 +332,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/manage/team': {
-      id: '/manage/team'
-      path: '/manage/team'
-      fullPath: '/manage/team'
-      preLoaderRoute: typeof ManageTeamRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -300,15 +340,17 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,
-  MeRoute: MeRoute,
-  MediaRoute: MediaRoute,
-  AdminAuditRoute: AdminAuditRoute,
+  ProfileRoute: ProfileRoute,
+  VerifyLoginRoute: VerifyLoginRoute,
+  AdminFamiliesRoute: AdminFamiliesRoute,
   AdminGrantsRoute: AdminGrantsRoute,
   AdminPrepareRoute: AdminPrepareRoute,
+  AdminPreparedRoute: AdminPreparedRoute,
+  AdminReaderClassesRoute: AdminReaderClassesRoute,
   AdminReleaseRoute: AdminReleaseRoute,
+  AdminRolesRoute: AdminRolesRoute,
   AdminSystemRoute: AdminSystemRoute,
   DIdRoute: DIdRoute,
-  ManageTeamRoute: ManageTeamRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

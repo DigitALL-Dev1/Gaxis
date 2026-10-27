@@ -1,24 +1,7 @@
+import { canUseModule } from "@/lib/lumen/permissions";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import {
-  LayoutDashboard,
-  Library,
-  BookOpenCheck,
-  PlayCircle,
-  FilePlus2,
-  Send,
-  KeyRound,
-  Users,
-  ScrollText,
-  Settings,
-  Bell,
-  Search,
-  Menu,
-  ChevronDown,
-  RotateCcw,
-  ShieldAlert,
-  LogOut,
-} from "lucide-react";
+import { Search, Menu, ChevronDown, LogOut } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -27,60 +10,15 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useLumen } from "@/lib/lumen/store";
-import { ROLES, ROLE_USERS, type Role } from "@/lib/lumen/data";
-import { ROLE_NAV, visibleDocs, type NavKey } from "@/lib/lumen/access";
+import { ADMIN_MODULES } from "@/lib/lumen/access";
+import { NAV } from "@/lib/lumen/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useDemoAuth } from "@/lib/lumen/auth";
-
-export const NAV: {
-  key: NavKey;
-  label: string;
-  to: string;
-  icon: typeof Library;
-  group: string;
-}[] = [
-  {
-    key: "dashboard",
-    label: "Dashboard",
-    to: "/dashboard",
-    icon: LayoutDashboard,
-    group: "Workspace",
-  },
-  { key: "library", label: "Document Library", to: "/library", icon: Library, group: "Workspace" },
-  { key: "me", label: "My Reading", to: "/me", icon: BookOpenCheck, group: "Workspace" },
-  { key: "media", label: "Media Library", to: "/media", icon: PlayCircle, group: "Workspace" },
-  {
-    key: "prepare",
-    label: "Prepare Document",
-    to: "/admin/prepare",
-    icon: FilePlus2,
-    group: "Publishing",
-  },
-  { key: "release", label: "Release Queue", to: "/admin/release", icon: Send, group: "Publishing" },
-  {
-    key: "grants",
-    label: "External Access",
-    to: "/admin/grants",
-    icon: KeyRound,
-    group: "Governance",
-  },
-  { key: "team", label: "Team Completion", to: "/manage/team", icon: Users, group: "Governance" },
-  { key: "audit", label: "Audit Logs", to: "/admin/audit", icon: ScrollText, group: "Governance" },
-  {
-    key: "system",
-    label: "Administration",
-    to: "/admin/system",
-    icon: Settings,
-    group: "Governance",
-  },
-];
+import { useAdminAuth } from "@/lib/lumen/admin-auth";
+import { displayRole, useUserAuth } from "@/lib/lumen/user-auth";
 
 function initials(n: string) {
   return n
@@ -90,11 +28,17 @@ function initials(n: string) {
     .slice(0, 2);
 }
 
-function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
-  const role = useLumen((s) => s.role);
-  const pending = useLumen((s) => s.docs.filter((d) => d.status === "Under Review").length);
+export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+  const admin = useAdminAuth((s) => s.admin);
+  const signedInUser = useUserAuth((s) => s.user);
   const path = useRouterState({ select: (s) => s.location.pathname });
-  const items = NAV.filter((n) => ROLE_NAV[role].includes(n.key));
+  const items = NAV.filter((n) =>
+    admin
+      ? ADMIN_MODULES.includes(n.key)
+      : signedInUser
+        ? canUseModule(signedInUser.permissions, n.key)
+        : false,
+  );
   const groups = [...new Set(items.map((i) => i.group))];
   return (
     <div className="flex h-full flex-col">
@@ -124,7 +68,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
                   (i.key === "library" && path.startsWith("/d/"));
                 return (
                   <Link
-                    key={i.key}
+                    key={i.to}
                     to={i.to}
                     onClick={onNavigate}
                     className={cn(
@@ -136,22 +80,12 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
                   >
                     <i.icon className="size-4" />
                     <span className="flex-1">{i.label}</span>
-                    {i.key === "release" && pending > 0 && (
-                      <span className="rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground">
-                        {pending}
-                      </span>
-                    )}
                   </Link>
                 );
               })}
           </div>
         ))}
       </nav>
-      <div className="m-3 rounded-lg border border-dashed bg-muted/60 p-3 text-[11px] leading-relaxed text-muted-foreground">
-        <ShieldAlert className="mb-1 size-3.5 text-warning" />
-        Prototype: roles and access rules are simulated in the browser. Production enforcement
-        happens on the server.
-      </div>
     </div>
   );
 }
@@ -160,24 +94,14 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const navigate = useNavigate();
-  const { role, setRole, reset, audit, docs, grants } = useLumen();
-  const user = ROLE_USERS[role];
-  const documentAccess = new Set(
-    visibleDocs(role, docs, grants).map((d) => `${d.title}:${d.version}`),
-  );
-  const notifications =
-    role === "Administrator"
-      ? audit
-      : audit.filter((a) => documentAccess.has(`${a.doc}:${a.version}`));
-
-  const changeRole = (r: string) => {
-    setRole(r as Role);
-    const current = useDemoAuth.getState().session;
-    if (current)
-      useDemoAuth.getState().signIn({ ...ROLE_USERS[r as Role], role: r as Role }, current.method);
-    toast.success(`Now viewing as ${r}`, { description: ROLE_USERS[r as Role].name });
-    navigate({ to: r === "External Reviewer" ? "/library" : "/dashboard" });
-  };
+  const admin = useAdminAuth((s) => s.admin);
+  const signedInUser = useUserAuth((s) => s.user);
+  const user = admin
+    ? { name: admin.name, email: admin.email }
+    : signedInUser
+      ? { name: signedInUser.full_name, email: signedInUser.email }
+      : { name: "", email: "" };
+  const roleLabel = admin ? "System Administrator" : signedInUser ? displayRole(signedInUser) : "";
 
   return (
     <div className="min-h-screen bg-background">
@@ -201,60 +125,24 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             <Menu />
           </Button>
-          <form
-            className="relative max-w-md flex-1"
-            onSubmit={(e) => {
-              e.preventDefault();
-              navigate({ to: "/library", search: { q } });
-            }}
-          >
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search documents by title or reference…"
-              className="h-10 bg-muted/60 pl-9"
-            />
-          </form>
+          {(admin || (signedInUser && canUseModule(signedInUser.permissions, "library"))) && (
+            <form
+              className="relative max-w-md flex-1"
+              onSubmit={(e) => {
+                e.preventDefault();
+                navigate({ to: "/library", search: { q } });
+              }}
+            >
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search documents by title or reference…"
+                className="h-10 bg-muted/60 pl-9"
+              />
+            </form>
+          )}
           <div className="ml-auto flex items-center gap-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
-                  <Bell className="size-5" />
-                  <span className="absolute right-2 top-2 size-2 rounded-full bg-primary" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
-                <DropdownMenuLabel>Recent activity</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {notifications.length === 0 && (
-                  <DropdownMenuItem disabled>
-                    No recent activity for your documents
-                  </DropdownMenuItem>
-                )}
-                {notifications.slice(0, 5).map((a) => (
-                  <DropdownMenuItem
-                    key={a.id}
-                    className="flex-col items-start gap-0.5"
-                    onClick={() =>
-                      navigate({
-                        to:
-                          role === "Administrator"
-                            ? "/admin/audit"
-                            : role === "External Reviewer"
-                              ? "/library"
-                              : "/dashboard",
-                      })
-                    }
-                  >
-                    <span className="text-sm font-medium">{a.action}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {a.doc} · v{a.version}
-                    </span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-muted">
@@ -263,7 +151,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   </span>
                   <span className="hidden text-left leading-tight sm:block">
                     <span className="block text-sm font-medium">{user.name}</span>
-                    <span className="block text-xs text-muted-foreground">{role}</span>
+                    <span className="block text-xs text-muted-foreground">{roleLabel}</span>
                   </span>
                   <ChevronDown className="size-4 text-muted-foreground" />
                 </button>
@@ -274,32 +162,19 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <div className="text-xs text-muted-foreground">{user.email}</div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel className="text-xs text-muted-foreground">
-                  Switch demo role
-                </DropdownMenuLabel>
-                <DropdownMenuRadioGroup value={role} onValueChange={changeRole}>
-                  {ROLES.map((r) => (
-                    <DropdownMenuRadioItem key={r} value={r}>
-                      {r}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => {
-                    reset();
-                    toast("Demo data reset");
-                  }}
-                >
-                  <RotateCcw className="size-4" />
-                  Reset demo data
+                <DropdownMenuItem onClick={() => navigate({ to: "/profile" })}>
+                  My Profile
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onClick={() => {
-                    useLumen.getState().log("Demo Sign Out", "GAXIS-Lumen", "—");
-                    useDemoAuth.getState().signOut();
-                    navigate({ to: "/login", replace: true });
+                  onClick={async () => {
+                    try {
+                      if (admin) useAdminAuth.getState().signOut();
+                      else await useUserAuth.getState().signOut();
+                      await navigate({ to: "/login", replace: true });
+                    } catch {
+                      toast.error("Could not sign out on the server. Please try again.");
+                    }
                   }}
                 >
                   <LogOut className="size-4" />

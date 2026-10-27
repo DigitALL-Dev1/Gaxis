@@ -1,10 +1,17 @@
-import { createRoot, type Root } from "react-dom/client";
+﻿import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, type ReactNode } from "react";
 import { AuthBoundary } from "@/components/lumen/AuthBoundary";
-import { useDemoAuth } from "@/lib/lumen/auth";
-import { useLumen } from "@/lib/lumen/store";
-import { ROLE_USERS } from "@/lib/lumen/data";
+import { useAdminAuth, type AdminDetails } from "@/lib/lumen/admin-auth";
+import { useUserAuth, type SignedInUser } from "@/lib/lumen/user-auth";
+const admin: AdminDetails = {
+  id: "admin_001",
+  name: "System Administrator",
+  email: "admin@example.com",
+  role: "super_admin",
+  status: "active",
+  created_at: "2026-10-20T00:00:00Z",
+};
 
 const routing = vi.hoisted(() => ({ path: "/dashboard", navigate: vi.fn() }));
 let root: Root | undefined;
@@ -35,9 +42,9 @@ vi.mock("@/components/lumen/common", () => ({ LoadingState: () => <span>Loading<
 beforeEach(() => {
   routing.path = "/dashboard";
   routing.navigate.mockReset();
-  useDemoAuth.getState().signOut();
-  vi.spyOn(useLumen.persist, "rehydrate").mockResolvedValue(undefined);
-  vi.spyOn(useDemoAuth.persist, "rehydrate").mockResolvedValue(undefined);
+  useAdminAuth.setState({ admin: null });
+  useUserAuth.setState({ user: null });
+  vi.spyOn(useUserAuth.getState(), "restore").mockResolvedValue();
 });
 afterEach(async () => {
   await act(async () => root?.unmount());
@@ -46,6 +53,13 @@ afterEach(async () => {
 });
 
 describe("Frontend session boundary", () => {
+  it("leaves the token verification page public without racing a session restore", async () => {
+    routing.path = "/verify-login";
+    const container = await renderBoundary("Verify login link");
+    expect(container.textContent).toContain("Verify login link");
+    expect(useUserAuth.getState().restore).not.toHaveBeenCalled();
+    expect(routing.navigate).not.toHaveBeenCalled();
+  });
   it("hides private content and sends a signed-out visitor to login", async () => {
     const container = await renderBoundary("Private document");
     expect(container.textContent).not.toContain("Private document");
@@ -58,22 +72,35 @@ describe("Frontend session boundary", () => {
     expect(container.textContent).toContain("Login form");
     expect(container.querySelector('[data-testid="workspace-shell"]')).toBeNull();
   });
-  it("restores the verified role before showing private content", async () => {
-    useLumen.getState().setRole("Administrator");
-    useDemoAuth.getState().signIn({ ...ROLE_USERS.Employee, role: "Employee" }, "Google Workspace");
+  it("renders the authenticated administrator after a successful password check", async () => {
+    useAdminAuth.setState({ admin });
     const container = await renderBoundary("Workspace content");
     expect(container.textContent).toContain("Workspace content");
-    expect(useLumen.getState().role).toBe("Employee");
+    expect(useAdminAuth.getState().admin).toEqual(admin);
   });
-  it("sends a signed-in external reviewer to the permitted library", async () => {
+  it("sends a signed-in administrator to the dashboard", async () => {
     routing.path = "/login";
-    useDemoAuth
-      .getState()
-      .signIn(
-        { ...ROLE_USERS["External Reviewer"], role: "External Reviewer" },
-        "Email login link",
-      );
+    useAdminAuth.setState({ admin: admin });
     await renderBoundary("Login form");
-    expect(routing.navigate).toHaveBeenCalledWith({ to: "/library", replace: true });
+    expect(routing.navigate).toHaveBeenCalledWith({ to: "/dashboard", replace: true });
+  });
+  it("restores a registered user and applies backend module access", async () => {
+    const user: SignedInUser = {
+      id: "507f1f77bcf86cd799439011",
+      full_name: "John Smith",
+      email: "john@example.com",
+      gaxis_user_id: null,
+      status: "active",
+      roles: [{ id: "507f1f77bcf86cd799439012", code: "DOCUMENT_OWNER", name: "Document Owner" }],
+      reader_class: { id: "507f1f77bcf86cd799439013", code: "EMPLOYEE", name: "Employee" },
+      permissions: ["documents.prepare"],
+      modules: ["dashboard", "profile", "prepare"],
+    };
+    vi.mocked(useUserAuth.getState().restore).mockImplementation(async () => {
+      useUserAuth.setState({ user });
+    });
+    const container = await renderBoundary("User workspace");
+    expect(container.textContent).toContain("User workspace");
+    expect(useUserAuth.getState().user).toEqual(user);
   });
 });

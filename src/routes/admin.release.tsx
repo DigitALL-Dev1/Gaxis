@@ -1,5 +1,5 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
-import { ReleaseQueue } from "@/components/lumen/workflows";
+import { ReleaseQueue } from "@/components/lumen/ReleaseQueue";
 import { RoleGate } from "@/components/lumen/common";
 import { pageHead } from "@/lib/lumen/head";
 
