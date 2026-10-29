@@ -39,7 +39,7 @@ describe("User cookie session", () => {
     fetchMock.mockResolvedValue({ ok: true, json: async () => profile });
     const user = await useUserAuth.getState().verifyToken("secret");
     expect(user.full_name).toBe("Zain Israr");
-    expect(user.modules.sort()).toEqual(["dashboard", "profile", "library"].sort());
+    expect(user.modules.sort()).toEqual(["dashboard", "profile", "library", "media"].sort());
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining("/verify-login-token"),
       expect.objectContaining({

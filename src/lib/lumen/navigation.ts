@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   Library,
+  Video,
   FilePlus2,
   FileText,
   Send,
@@ -27,6 +28,14 @@ export const NAV: {
     group: "Workspace",
   },
   { key: "library", label: "Document Library", to: "/library", icon: Library, group: "Workspace" },
+  { key: "media", label: "Media Library", to: "/media", icon: Video, group: "Workspace" },
+  {
+    key: "mediaPrepare",
+    label: "Prepare Media",
+    to: "/admin/media/prepare",
+    icon: FilePlus2,
+    group: "Publishing",
+  },
   {
     key: "prepare",
     label: "Prepare Document",

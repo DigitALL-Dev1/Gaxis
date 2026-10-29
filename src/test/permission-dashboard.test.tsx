@@ -53,15 +53,18 @@ describe("Permission-based dashboard and routes", () => {
       },
     });
     render(<SidebarNav />);
-    for (const name of ["My Reading", "Media Library", "Team Progress", "Audit Logs"])
+    for (const name of ["My Reading", "Team Progress", "Audit Logs"])
       expect(screen.queryByRole("link", { name })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Media Library" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Prepare Media" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Access Grants" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Release Queue" })).toBeInTheDocument();
   });
   it("maps each permission independently, with no management access inferred from roles", () => {
     expect(modulesForPermissions(user.permissions).sort()).toEqual(
-      ["dashboard", "library", "profile"].sort(),
+      ["dashboard", "library", "media", "profile"].sort(),
     );
+    expect(canUseModule(["documents.prepare"], "mediaPrepare")).toBe(true);
     expect(canUseModule([], "roles")).toBe(false);
     expect(canUseModule(["roles.manage"], "roles")).toBe(true);
     expect(canUseModule(["roles.manage"], "system")).toBe(false);
@@ -80,7 +83,7 @@ describe("Permission-based dashboard and routes", () => {
     );
     expect(screen.getByText("Welcome, Zain Israr")).toBeInTheDocument();
     expect(screen.getByText("Manager · Employee")).toBeInTheDocument();
-    for (const name of ["Document Library", "My Profile"])
+    for (const name of ["Document Library", "Media Library", "My Profile"])
       expect(screen.getByRole("link", { name })).toBeInTheDocument();
     for (const name of [
       "User Management",
@@ -94,7 +97,7 @@ describe("Permission-based dashboard and routes", () => {
 
   it("uses permissions for the sidebar even if incoming module names are forged", () => {
     render(<SidebarNav />);
-    for (const name of ["Dashboard", "Document Library", "My Profile"])
+    for (const name of ["Dashboard", "Document Library", "Media Library", "My Profile"])
       expect(screen.getByRole("link", { name })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Roles Management" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "User Management" })).not.toBeInTheDocument();

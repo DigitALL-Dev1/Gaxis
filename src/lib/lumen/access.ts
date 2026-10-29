@@ -2,6 +2,8 @@ export type NavKey =
   | "dashboard"
   | "profile"
   | "library"
+  | "media"
+  | "mediaPrepare"
   | "prepare"
   | "prepared"
   | "release"

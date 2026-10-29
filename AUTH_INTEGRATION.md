@@ -39,8 +39,10 @@ Backend router dependencies independently check the current cookie session and d
 
 - Start from `backend/.env.example` without replacing existing secrets. Configure MongoDB, SMTP, `FRONTEND_BASE_URL` and exact `FRONTEND_ORIGINS` for the frontend's actual port.
 - Restart the backend on port 8001 to load `/me`, `/logout`, sessions and permission checks. Previously issued plaintext-token links must be replaced by requesting a new link.
-- Frontend `VITE_API_BASE_URL` defaults to `http://127.0.0.1:8001`. During loopback development, requests use the browser's localhost/127.0.0.1 hostname consistently so SameSite cookies work. Email callbacks default to `http://127.0.0.1:8081`; configure the actual frontend URL.
+- Frontend `VITE_API_BASE_URL` defaults to `http://127.0.0.1:8001` for development and `http://217.216.76.178:8002` in production builds. Set `VITE_API_BASE_URL` at build time to override either default. During loopback development, requests use the browser's localhost/127.0.0.1 hostname consistently so SameSite cookies work. Email callbacks default to `http://127.0.0.1:8081`; configure the actual frontend URL.
 - In production use HTTPS with `SESSION_COOKIE_SECURE=true` and frontend/API origins on the same site (or proxy `/api` on the frontend origin), plus the exact CORS allowlist.
+
+The configured production backend URL is HTTP. Browsers block requests to it when the frontend itself is served over HTTPS; in that deployment, serve the API over HTTPS or proxy `/api` through the HTTPS frontend origin and set `VITE_API_BASE_URL` accordingly.
 
 The dashboard and access gates use login APIs. Document preparation, the approved library, version details and the pending review list now use backend APIs; see DOCUMENT_MANAGEMENT_INTEGRATION.md. Unintegrated team progress, reading acknowledgement, media and audit screens have been removed from routes and navigation; their permissions do not expose modules until a real integration is implemented. Independent approval, returns, authenticated previews and review history are integrated; see DOCUMENT_RELEASE_INTEGRATION.md.
 

@@ -4,6 +4,8 @@ export const MODULE_PERMISSIONS: Record<NavKey, readonly string[]> = {
   dashboard: [],
   profile: [],
   library: ["documents.read"],
+  media: ["documents.read", "documents.prepare", "documents.release"],
+  mediaPrepare: ["documents.prepare"],
   prepare: ["documents.prepare"],
   prepared: ["documents.prepare"],
   release: ["documents.review", "documents.release"],

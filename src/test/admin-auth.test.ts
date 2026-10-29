@@ -1,4 +1,5 @@
 ﻿import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { apiBase } from "@/lib/lumen/api-base";
 import { getAdminAuthorization, useAdminAuth } from "@/lib/lumen/admin-auth";
 
 const admin = {
@@ -27,11 +28,14 @@ describe("Simple administrator password check", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: "admin@example.com", password: "test-only-value" }),
     });
-    expect(useAdminAuth.getState().admin).toEqual(expect.objectContaining({
-      email: admin.email,
-      role: "super_admin",
-      status: "active",
-    }));
+    expect(fetchMock.mock.calls[0]![0]).toBe(`${apiBase()}/api/v1/auth/login`);
+    expect(useAdminAuth.getState().admin).toEqual(
+      expect.objectContaining({
+        email: admin.email,
+        role: "super_admin",
+        status: "active",
+      }),
+    );
     expect(JSON.stringify(useAdminAuth.getState().admin)).not.toContain("test-only-value");
     expect(getAdminAuthorization()).toBe(`Basic ${btoa("admin@example.com:test-only-value")}`);
   });

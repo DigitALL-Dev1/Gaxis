@@ -10,7 +10,7 @@ User, role, reader class, family and document management use FastAPI and MongoDB
 
 Access Grants Management uses database users, eligible approved documents and explicit CEO/divisional-manager disclosure approval. It supports pending requests, rejection, revocation, renewal and expiry monitoring. Configure ordinary family grant approvers in Document Families. See [access grants integration](ACCESS_GRANTS_INTEGRATION.md).
 
-Document details display actual metadata, review history and authenticated file previews (PDF inline, Word download). The dashboard uses API summaries and approved documents. Unintegrated My Reading, Media Library, Team Progress and Audit Logs screens, seeded data, sample notifications and demo reset controls have been removed. See [frontend module review](FRONTEND_MODULE_REVIEW.md).
+Document details display actual metadata, review history and authenticated file previews (PDF inline, Word download). The dashboard uses API summaries and approved documents. Media Library provides permission-filtered playback, playback progress, captions/transcripts and media processing review; Prepare Media uploads controlled video and audio for the existing independent release workflow. My Reading, Team Progress and Audit Logs remain unintegrated. See [media integration](MEDIA_INTEGRATION.md) and [frontend module review](FRONTEND_MODULE_REVIEW.md).
 
 Uses React, TypeScript, Vite, Zustand, Mantine and the existing Lovable TanStack router. Production identity integration with GAXIS M1 remains separate. Restart the backend after Python changes to load the latest session, permission and upload routes.
 

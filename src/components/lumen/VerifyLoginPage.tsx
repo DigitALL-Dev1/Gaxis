@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Alert, Button, Loader, Stack } from "@mantine/core";
 import { resumeLoginVerification, useUserAuth } from "@/lib/lumen/user-auth";
 
-export function VerifyLoginPage({ token: searchToken }: { token?: string }) {
+export function VerifyLoginPage({ token: searchToken }: { token?: string | undefined }) {
   const [token] = useState(
     () =>
       searchToken ||

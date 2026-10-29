@@ -57,7 +57,7 @@ export async function request<T>(
   path: string,
   method: string = "GET",
   body?: unknown,
-  responseType: "json" | "blob" = "json",
+  responseType: "json" | "blob" | "text" = "json",
 ): Promise<T> {
   const authorization = useAdminAuth.getState().admin ? getAdminAuthorization() : null;
   const multipart = body instanceof FormData;
@@ -93,7 +93,9 @@ export async function request<T>(
           : "Unable to load or save data. Please try again.",
     );
   }
-  return responseType === "blob" ? (response.blob() as Promise<T>) : response.json();
+  if (responseType === "blob") return response.blob() as Promise<T>;
+  if (responseType === "text") return response.text() as Promise<T>;
+  return response.json();
 }
 
 export async function loadUserManagement() {

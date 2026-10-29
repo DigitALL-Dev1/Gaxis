@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MediaRouteImport } from './routes/media'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as VerifyLoginRouteImport } from './routes/verify-login'
 import { Route as AdminFamiliesRouteImport } from './routes/admin.families'
@@ -24,6 +25,7 @@ import { Route as AdminReleaseRouteImport } from './routes/admin.release'
 import { Route as AdminRolesRouteImport } from './routes/admin.roles'
 import { Route as AdminSystemRouteImport } from './routes/admin.system'
 import { Route as DIdRouteImport } from './routes/d.$id'
+import { Route as AdminMediaPrepareRouteImport } from './routes/admin.media.prepare'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -43,6 +45,11 @@ const LibraryRoute = LibraryRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MediaRoute = MediaRouteImport.update({
+  id: '/media',
+  path: '/media',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -100,12 +107,18 @@ const DIdRoute = DIdRouteImport.update({
   path: '/d/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminMediaPrepareRoute = AdminMediaPrepareRouteImport.update({
+  id: '/admin/media/prepare',
+  path: '/admin/media/prepare',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
+  '/media': typeof MediaRoute
   '/profile': typeof ProfileRoute
   '/verify-login': typeof VerifyLoginRoute
   '/admin/families': typeof AdminFamiliesRoute
@@ -117,12 +130,14 @@ export interface FileRoutesByFullPath {
   '/admin/roles': typeof AdminRolesRoute
   '/admin/system': typeof AdminSystemRoute
   '/d/$id': typeof DIdRoute
+  '/admin/media/prepare': typeof AdminMediaPrepareRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
+  '/media': typeof MediaRoute
   '/profile': typeof ProfileRoute
   '/verify-login': typeof VerifyLoginRoute
   '/admin/families': typeof AdminFamiliesRoute
@@ -134,6 +149,7 @@ export interface FileRoutesByTo {
   '/admin/roles': typeof AdminRolesRoute
   '/admin/system': typeof AdminSystemRoute
   '/d/$id': typeof DIdRoute
+  '/admin/media/prepare': typeof AdminMediaPrepareRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -141,6 +157,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
+  '/media': typeof MediaRoute
   '/profile': typeof ProfileRoute
   '/verify-login': typeof VerifyLoginRoute
   '/admin/families': typeof AdminFamiliesRoute
@@ -152,6 +169,7 @@ export interface FileRoutesById {
   '/admin/roles': typeof AdminRolesRoute
   '/admin/system': typeof AdminSystemRoute
   '/d/$id': typeof DIdRoute
+  '/admin/media/prepare': typeof AdminMediaPrepareRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -160,6 +178,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/library'
     | '/login'
+    | '/media'
     | '/profile'
     | '/verify-login'
     | '/admin/families'
@@ -171,12 +190,14 @@ export interface FileRouteTypes {
     | '/admin/roles'
     | '/admin/system'
     | '/d/$id'
+    | '/admin/media/prepare'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
     | '/library'
     | '/login'
+    | '/media'
     | '/profile'
     | '/verify-login'
     | '/admin/families'
@@ -188,12 +209,14 @@ export interface FileRouteTypes {
     | '/admin/roles'
     | '/admin/system'
     | '/d/$id'
+    | '/admin/media/prepare'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
     | '/library'
     | '/login'
+    | '/media'
     | '/profile'
     | '/verify-login'
     | '/admin/families'
@@ -205,6 +228,7 @@ export interface FileRouteTypes {
     | '/admin/roles'
     | '/admin/system'
     | '/d/$id'
+    | '/admin/media/prepare'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -212,6 +236,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
+  MediaRoute: typeof MediaRoute
   ProfileRoute: typeof ProfileRoute
   VerifyLoginRoute: typeof VerifyLoginRoute
   AdminFamiliesRoute: typeof AdminFamiliesRoute
@@ -223,6 +248,7 @@ export interface RootRouteChildren {
   AdminRolesRoute: typeof AdminRolesRoute
   AdminSystemRoute: typeof AdminSystemRoute
   DIdRoute: typeof DIdRoute
+  AdminMediaPrepareRoute: typeof AdminMediaPrepareRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -253,6 +279,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/media': {
+      id: '/media'
+      path: '/media'
+      fullPath: '/media'
+      preLoaderRoute: typeof MediaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -332,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/media/prepare': {
+      id: '/admin/media/prepare'
+      path: '/admin/media/prepare'
+      fullPath: '/admin/media/prepare'
+      preLoaderRoute: typeof AdminMediaPrepareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -340,6 +380,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,
+  MediaRoute: MediaRoute,
   ProfileRoute: ProfileRoute,
   VerifyLoginRoute: VerifyLoginRoute,
   AdminFamiliesRoute: AdminFamiliesRoute,
@@ -351,6 +392,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRolesRoute: AdminRolesRoute,
   AdminSystemRoute: AdminSystemRoute,
   DIdRoute: DIdRoute,
+  AdminMediaPrepareRoute: AdminMediaPrepareRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
