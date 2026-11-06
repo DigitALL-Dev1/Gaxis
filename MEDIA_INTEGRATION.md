@@ -32,7 +32,8 @@ All requests use the existing cookie-authenticated Lumen session and `/api/v1/lu
 - `documents.prepare` can prepare media and manage items in the user's assigned families.
 - `documents.read` can browse and play currently approved media when the backend's classification, reader-class, family and grant checks allow it.
 - `documents.release` allows assigned releasers to manage their family's media and release versions through the existing review workflow.
-- Backend media authorization checks the corresponding document permissions; it does not rely on menu visibility.
+- The bootstrap administrator can list all media, inspect and retry processing, review captions and prepare media. Preparation is recorded under the selected family's active owner, with the administrator noted in the audit log. Playback stays disabled because that login has no user record or reader class.
+- Backend media authorization checks the corresponding document permissions; it does not rely on menu visibility. The router gate also accepts the `media.read` alias, but playback still requires `documents.read`.
 - The backend awards playback credit only for continuously played ranges and makes acknowledgement eligibility available after at least 90% unique playback when acknowledgement is required. Playback eligibility is not itself an acknowledgement.
 - Captions and transcripts remain editable only before release and must be human-reviewed when required. Media streams and progress requests are reauthorized by the backend.
 
@@ -46,5 +47,5 @@ All requests use the existing cookie-authenticated Lumen session and `/api/v1/lu
 
 ## Verification
 
-Frontend: `bun run test -- src/test/media-api.test.ts src/test/app-routing.test.tsx --pool=threads --maxWorkers=1`, `bunx tsc --noEmit`, and `bun run build`.
-Backend permission contract: `python -m unittest discover -s tests -p test_user_sessions.py`.
+Frontend: `bun run test -- src/test/media-api.test.ts src/test/media-player.test.tsx src/test/media-preparation.test.tsx src/test/app-routing.test.tsx --pool=threads --maxWorkers=1`, `bunx tsc --noEmit`, and `bun run build`.
+Backend permission contract: `python -m unittest discover -s tests -p test_user_sessions.py` and `python -m unittest discover -s tests -p test_media_admin.py`.

@@ -29,6 +29,7 @@ import {
   type MediaLicence,
   type MediaType,
 } from "@/lib/lumen/media-api";
+import { useAdminAuth } from "@/lib/lumen/admin-auth";
 import { useUserAuth } from "@/lib/lumen/user-auth";
 
 const LICENCE_OPTIONS: { value: MediaLicence; label: string }[] = [
@@ -38,8 +39,14 @@ const LICENCE_OPTIONS: { value: MediaLicence; label: string }[] = [
   { value: "REFERENCE_ONLY", label: "External reference only" },
 ];
 
+/** Reference-only items have no hosted file, so only hosted media can be revised here. */
+function revisableMedia(media: MediaAsset[]) {
+  return media.filter((asset) => asset.licence_status !== "REFERENCE_ONLY");
+}
+
 export function MediaPreparation() {
   const user = useUserAuth((state) => state.user);
+  const isAdmin = useAdminAuth((state) => !!state.admin);
   const [families, setFamilies] = useState<ApiDocumentFamily[]>([]);
   const [classes, setClasses] = useState<ApiReaderClass[]>([]);
   const [existingMedia, setExistingMedia] = useState<MediaAsset[]>([]);
@@ -74,16 +81,12 @@ export function MediaPreparation() {
         listMedia(),
       ]);
       setFamilies(
-        familyData.filter((family) => family.is_active && family.owner_user_id === user?.id),
-      );
-      setClasses(classData.filter((readerClass) => readerClass.is_active));
-      setExistingMedia(
-        mediaData.filter(
-          (asset) =>
-            asset.licence_status !== "REFERENCE_ONLY" &&
-            ["QUEUED", "PROCESSING", "COMPLETED", "FAILED"].includes(asset.processing_status),
+        familyData.filter(
+          (family) => family.is_active && (isAdmin || family.owner_user_id === user?.id),
         ),
       );
+      setClasses(classData.filter((readerClass) => readerClass.is_active));
+      setExistingMedia(revisableMedia(mediaData));
     } catch (cause) {
       setLoadError(
         cause instanceof Error ? cause.message : "Unable to load media preparation options.",
@@ -91,26 +94,35 @@ export function MediaPreparation() {
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+  }, [isAdmin, user?.id]);
 
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
+  function resetForm() {
+    setDocumentId(null);
+    setTitle("");
+    setReference("");
+    setFamilyId(null);
+    setClassification("D2");
+    setReaderIds([]);
+    setVersion("1.0");
+    setMediaType("VIDEO");
+    setLicence("OWNED");
+    setLicenceReference("");
+    setExternalUrl("");
+    setDescription("");
+    setAcknowledgementRequired(true);
+    setSafetyOrInduction(false);
+    setFile(null);
+  }
+
   async function selectExistingMedia(mediaId: string | null) {
     setError("");
     setDocumentId(null);
     if (!mediaId) {
-      setTitle("");
-      setReference("");
-      setFamilyId(null);
-      setClassification("D2");
-      setReaderIds([]);
-      setAcknowledgementRequired(true);
-      setLicence("OWNED");
-      setLicenceReference("");
-      setExternalUrl("");
-      setFile(null);
+      resetForm();
       return;
     }
 
@@ -214,16 +226,9 @@ export function MediaPreparation() {
               toast.success("Media submitted for review", {
                 description: `Processing: ${result.processing_status}`,
               });
-              setTitle("");
-              setReference("");
-              setVersion("1.0");
-              setDescription("");
-              setFile(null);
-              setDocumentId(null);
-              setFamilyId(null);
-              setReaderIds([]);
+              resetForm();
               try {
-                setExistingMedia(await listMedia());
+                setExistingMedia(revisableMedia(await listMedia()));
               } catch {
                 toast.error("Media was submitted, but the revision list could not be refreshed.");
               }
@@ -409,6 +414,8 @@ export function MediaPreparation() {
                 <Text size="sm" c="dimmed">
                   Video captions and transcript require human review. A separate authorised releaser
                   must approve media before it becomes available to readers.
+                  {isAdmin &&
+                    " Administrator submissions are recorded under the selected family's owner."}
                 </Text>
                 <Button type="submit" loading={saving} disabled={!!loadError || !familyId}>
                   {saving ? "Submitting media…" : "Submit for review"}

@@ -16,6 +16,8 @@ export type NavKey =
 export const ADMIN_MODULES: readonly NavKey[] = [
   "dashboard",
   "library",
+  "media",
+  "mediaPrepare",
   "prepare",
   "prepared",
   "release",

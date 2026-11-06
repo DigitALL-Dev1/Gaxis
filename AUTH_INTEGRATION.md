@@ -27,7 +27,8 @@ Login tokens and session secrets are stored as SHA-256 hashes. The cookie lasts 
 | `document_families.manage` | Document Families |
 | `access_grants.manage` or existing `grants.manage` | Access Grants Management |
 | `audit.read` | Audit Logs |
-| `media.read` | Media Library |
+| `documents.read`, `documents.prepare`, or `documents.release` | Media Library |
+| `documents.prepare` | Prepare Media |
 
 Dashboard and My Profile are available to every authenticated user. Role and reader class names are display labels; menu visibility and route access use permissions. The frontend derives module names locally from the permission array and ignores any incoming or saved module list. User Management gates Create and Edit/Status actions separately.
 

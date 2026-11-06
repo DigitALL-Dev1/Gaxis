@@ -13,12 +13,12 @@ The current release retains modules backed by the integrated authentication and 
 | Roles Management | Role definitions and permissions |
 | Reader Classes Management | Reader eligibility rules |
 | Document Families | Owners, releasers and grant approvers |
+| Media Library / Prepare Media | Permitted playback, processing, caption review and controlled preparation |
 | My Profile | Actual authenticated user details |
 
 | Removed module or control | Reason |
 | --- | --- |
 | My Reading | Sample acknowledgement workflow without its API integration |
-| Media Library | Sample media records and playback workflow |
 | Team Progress | Sample employee progress records |
 | Audit Logs | Browser-generated sample audit activity |
 | Notifications / Reset demo data | Operated on seeded browser data |

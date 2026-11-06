@@ -55,8 +55,8 @@ describe("Permission-based dashboard and routes", () => {
     render(<SidebarNav />);
     for (const name of ["My Reading", "Team Progress", "Audit Logs"])
       expect(screen.queryByRole("link", { name })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Media Library" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Prepare Media" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Media Library" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Prepare Media" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Access Grants" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Release Queue" })).toBeInTheDocument();
   });

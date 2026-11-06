@@ -24,7 +24,7 @@ export function MediaPlayer({ media }: { media: MediaAsset }) {
   const playerRef = useRef<HTMLMediaElement | null>(null);
   const sessionIdRef = useRef<string | null>(null);
   const positionRef = useRef(0);
-  const progressTask = useRef<Promise<MediaPlaybackSession | null> | null>(null);
+  const progressTask = useRef<Promise<MediaPlaybackSession | null>>(Promise.resolve(null));
   const ended = useRef(false);
   const [renditions, setRenditions] = useState<MediaRenditions | null>(null);
   const [session, setSession] = useState<MediaPlaybackSession | null>(null);
@@ -37,26 +37,30 @@ export function MediaPlayer({ media }: { media: MediaAsset }) {
   const [transcriptLoading, setTranscriptLoading] = useState(false);
 
   const syncProgress = useCallback(
-    async (event: "PLAY" | "HEARTBEAT" | "PAUSE" | "SEEK" | "ENDED") => {
-      if (progressTask.current) await progressTask.current;
-      const sessionId = sessionIdRef.current;
-      if (!sessionId) return null;
-      const task = reportMediaProgress(sessionId, playerRef.current?.currentTime ?? 0, event)
-        .then((result) => {
+    (event: "PLAY" | "HEARTBEAT" | "PAUSE" | "SEEK" | "ENDED") => {
+      // The backend rejects overlapping updates, so events are sent strictly one at a time.
+      const task = progressTask.current.then(async () => {
+        const sessionId = sessionIdRef.current;
+        if (!sessionId) return null;
+        // Renditions can run slightly longer than the probed source duration.
+        const position = Math.min(
+          playerRef.current?.currentTime ?? 0,
+          media.duration_seconds ?? Infinity,
+        );
+        try {
+          const result = await reportMediaProgress(sessionId, position, event);
           setSession(result);
           return result;
-        })
-        .catch((cause) => {
+        } catch (cause) {
           setError(cause instanceof Error ? cause.message : "Unable to save playback progress.");
           setPlaying(false);
           return null;
-        });
+        }
+      });
       progressTask.current = task;
-      const result = await task;
-      if (progressTask.current === task) progressTask.current = null;
-      return result;
+      return task;
     },
-    [],
+    [media.duration_seconds],
   );
 
   useEffect(() => {
@@ -104,7 +108,7 @@ export function MediaPlayer({ media }: { media: MediaAsset }) {
       if (sessionId) {
         void (async () => {
           try {
-            if (progressTask.current) await progressTask.current;
+            await progressTask.current;
             await closeMediaPlayback(sessionId);
           } catch (cause) {
             console.error("Unable to close the media playback session.", cause);
@@ -147,6 +151,22 @@ export function MediaPlayer({ media }: { media: MediaAsset }) {
     }
   }
 
+  async function reportPlay() {
+    // Finished playback closes its session, so replaying has to resume it first.
+    if (!sessionIdRef.current) {
+      try {
+        const playback = await startMediaPlayback(media._id);
+        sessionIdRef.current = playback.session_id;
+        setSession(playback);
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : "Unable to resume media playback.");
+        setPlaying(false);
+        return;
+      }
+    }
+    await syncProgress("PLAY");
+  }
+
   async function finishPlayback() {
     ended.current = true;
     const result = await syncProgress("ENDED");
@@ -170,7 +190,7 @@ export function MediaPlayer({ media }: { media: MediaAsset }) {
     onPlay: () => {
       ended.current = false;
       setPlaying(true);
-      void syncProgress("PLAY");
+      void reportPlay();
     },
     onPause: () => {
       setPlaying(false);

@@ -25,6 +25,7 @@ import {
   type MediaAsset,
   type MediaProcessingStatus,
 } from "@/lib/lumen/media-api";
+import { useAdminAuth } from "@/lib/lumen/admin-auth";
 import { useUserAuth } from "@/lib/lumen/user-auth";
 
 function durationLabel(seconds: number | null) {
@@ -42,9 +43,12 @@ function humanStatus(status: string) {
 
 export function MediaLibrary() {
   const user = useUserAuth((state) => state.user);
-  const canManage = !!user?.permissions.some((permission) =>
-    ["documents.prepare", "documents.release"].includes(permission),
-  );
+  const admin = useAdminAuth((state) => state.admin);
+  const canManage =
+    !!admin ||
+    !!user?.permissions.some((permission) =>
+      ["documents.prepare", "documents.release"].includes(permission),
+    );
   const [media, setMedia] = useState<MediaAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -172,7 +176,11 @@ export function MediaLibrary() {
       <PageHeader
         crumb="Workspace / Media"
         title="Media Library"
-        description="Browse permitted approved media. Playback progress is recorded for hosted media; external references do not create playback evidence."
+        description={
+          admin
+            ? "Manage processing and captions for all media. Playback is watermarked and recorded per person, so it needs a user account."
+            : "Browse permitted approved media. Playback progress is recorded for hosted media; external references do not create playback evidence."
+        }
       />
       <Group justify="space-between" mb="md">
         <Text size="sm" c="dimmed">
@@ -237,15 +245,17 @@ export function MediaLibrary() {
                     </Text>
                   )}
                   <Group>
-                    <Button
-                      disabled={
-                        asset.licence_status !== "REFERENCE_ONLY" &&
-                        asset.processing_status !== "COMPLETED"
-                      }
-                      onClick={() => setPlaying(asset)}
-                    >
-                      {asset.licence_status === "REFERENCE_ONLY" ? "Open reference" : "Play"}
-                    </Button>
+                    {!admin && (
+                      <Button
+                        disabled={
+                          asset.licence_status !== "REFERENCE_ONLY" &&
+                          asset.processing_status !== "COMPLETED"
+                        }
+                        onClick={() => setPlaying(asset)}
+                      >
+                        {asset.licence_status === "REFERENCE_ONLY" ? "Open reference" : "Play"}
+                      </Button>
+                    )}
                     {canManage && (
                       <Button variant="default" onClick={() => void showProcessing(asset)}>
                         Processing
